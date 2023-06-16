@@ -185,7 +185,7 @@ async function drawCharacterSkills(characterSkillsData, primaryColor, secondaryC
         //ctx.fillRect(SKILL_ITEM_TL_X + SKILL_WIDTH_PADDING * i, SKILL_ITEM_TL_Y, SKILL_ITEM_DIMENSIONS, SKILL_ITEM_DIMENSIONS);
         // Picture from URL
         const skillIconURL = characterSkillsData[`character_${skillText[i]}_icon_url`];
-        const skillIcon = await loadImage(`${ASSETS_BASE_URL}${skillIconURL}`);
+        const skillIcon = await colorImage(`${ASSETS_BASE_URL}${skillIconURL}`, secondaryColor);
         ctx.drawImage(skillIcon, SKILL_ITEM_TL_X + SKILL_WIDTH_PADDING * i, SKILL_ITEM_TL_Y, SKILL_ITEM_DIMENSIONS, SKILL_ITEM_DIMENSIONS);
         // Skill tag
         ctx.fillStyle = secondaryColor;
@@ -746,11 +746,15 @@ async function drawProfile(UID, primaryColor, secondaryColor) {
     const fileName = `out_${Date.now()}.png`;
     await fs.promises.writeFile((`/tmp/${fileName}`), pngData);
     // join(__dirname,'out.png')
+    // `/tmp/${fileName}`
     return join(`/tmp/${fileName}`);
 }
 
 // Load in the 'Inter' font
 app.use(express.static(join(__dirname, 'fonts')));
+
+// TODO: Show Relic star level (3, 4, 5 star)
+// TODO: Have an option to hide UID
 
 app.get('/api/generate', async (req, res) => {
     const { uid, primarycolor, secondarycolor } = req.query;
