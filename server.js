@@ -736,8 +736,8 @@ async function drawProfile(UID, primaryColor, secondaryColor) {
 
     const pngData = await canvas.encode('png') // JPEG, AVIF and WebP are also supported
     // encoding in libuv thread pool, non-blocking
-    await fs.promises.writeFile(join(__dirname, 'out.png'), pngData)
-    return join(__dirname, 'out.png');
+    await fs.promises.writeFile(('/tmp/out.png'), pngData);
+    return join('/tmp/out.png');
 }
 
 app.get('/api/generate', async (req, res) => {
