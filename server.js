@@ -5,7 +5,14 @@ const fs = require('fs');
 const { join } = require('path');
 const express = require('express')
 const app = express()
-const { createCanvas, loadImage } = require('@napi-rs/canvas');
+const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
+
+// Register the 'Inter' font
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Regular.ttf'), 'Inter-Regular');
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Medium.ttf'), 'Inter-Medium');
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-SemiBold.ttf'), 'Inter-SemiBold');
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Bold.ttf'), 'Inter-Bold');
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-ExtraBold.ttf'), 'Inter-ExtraBold');
 
 const FONT_FAMILY = 'Inter';
 const FONT_MEDIUM = '500';
@@ -738,7 +745,7 @@ async function drawProfile(UID, primaryColor, secondaryColor) {
     // encoding in libuv thread pool, non-blocking
     await fs.promises.writeFile(('/tmp/out.png'), pngData);
     // '/tmp/out.png'
-    // 'join(__dirname,'out.png')
+    // join(__dirname,'out.png')
     return join('/tmp/out.png');
 }
 
