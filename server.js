@@ -710,39 +710,34 @@ async function getSecondaryColor() {
 }
 
 async function drawProfile(UID, primaryColor, secondaryColor) {
-    try {
-        // Get JSON data from API
-        const response = await fetch(`${API_BASE_URL_PREPEND}${UID}${API_BASE_URL_APPEND}`);
-        const jsonData = await response.json();
-        // Get JSON data from local file
-        //const rawData = await fs.promises.readFile(LOCAL_TEST_JSON, 'utf-8');
-        //const jsonData = JSON.parse(rawData);
-        const playerData = extractPlayerData(jsonData);
-        const characterData = extractCharacterData(jsonData.characters[0]);
-        const characterSkillsData = extractCharacterSkillsData(jsonData.characters[0]);
-        const characterAttributesData = extractCharacterAttributesData(jsonData.characters[0]);
-        const characterAdditionsData = sortAdditions(extractCharacterAdditionsData(jsonData.characters[0]));
-        const relicsData = shortenStatName(extractRelicData(jsonData.characters[0]));
-        const lightConeData = extractLightConeData(jsonData.characters[0]);
+    // Get JSON data from API
+    const response = await fetch(`${API_BASE_URL_PREPEND}${UID}${API_BASE_URL_APPEND}`);
+    const jsonData = await response.json();
+    // Get JSON data from local file
+    //const rawData = await fs.promises.readFile(LOCAL_TEST_JSON, 'utf-8');
+    //const jsonData = JSON.parse(rawData);
+    const playerData = extractPlayerData(jsonData);
+    const characterData = extractCharacterData(jsonData.characters[0]);
+    const characterSkillsData = extractCharacterSkillsData(jsonData.characters[0]);
+    const characterAttributesData = extractCharacterAttributesData(jsonData.characters[0]);
+    const characterAdditionsData = sortAdditions(extractCharacterAdditionsData(jsonData.characters[0]));
+    const relicsData = shortenStatName(extractRelicData(jsonData.characters[0]));
+    const lightConeData = extractLightConeData(jsonData.characters[0]);
 
-        await drawBackground(primaryColor, secondaryColor);
-        await drawHeader(playerData.player_nickname, secondaryColor);
-        await drawRelics(relicsData, lightConeData, primaryColor, secondaryColor);
-        await drawCharacterSkills(characterSkillsData, primaryColor, secondaryColor);
-        await drawCharacterWindow(characterData, primaryColor, secondaryColor);
-        await drawCharacterStats(characterAttributesData, characterAdditionsData, secondaryColor);
-        await drawWatermark(secondaryColor);
-        await drawBottom(playerData.player_uid, playerData.player_level, playerData.player_achievement_count, primaryColor);
-        //await drawExtras(primaryColor, secondaryColor);
+    await drawBackground(primaryColor, secondaryColor);
+    await drawHeader(playerData.player_nickname, secondaryColor);
+    await drawRelics(relicsData, lightConeData, primaryColor, secondaryColor);
+    await drawCharacterSkills(characterSkillsData, primaryColor, secondaryColor);
+    await drawCharacterWindow(characterData, primaryColor, secondaryColor);
+    await drawCharacterStats(characterAttributesData, characterAdditionsData, secondaryColor);
+    await drawWatermark(secondaryColor);
+    await drawBottom(playerData.player_uid, playerData.player_level, playerData.player_achievement_count, primaryColor);
+    //await drawExtras(primaryColor, secondaryColor);
 
-        const pngData = await canvas.encode('png') // JPEG, AVIF and WebP are also supported
-        // encoding in libuv thread pool, non-blocking
-        await fs.promises.writeFile(join(__dirname, './out.png'), pngData)
-        return join(__dirname, './out.png');
-    }
-    catch (error) {
-        console.log(error);
-    }
+    const pngData = await canvas.encode('png') // JPEG, AVIF and WebP are also supported
+    // encoding in libuv thread pool, non-blocking
+    await fs.promises.writeFile(join(__dirname, 'out.png'), pngData)
+    return join(__dirname, 'out.png');
 }
 
 app.get('/api/generate', async (req, res) => {
@@ -762,3 +757,5 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+
+module.exports = app;
