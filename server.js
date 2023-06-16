@@ -743,10 +743,10 @@ async function drawProfile(UID, primaryColor, secondaryColor) {
 
     const pngData = await canvas.encode('png') // JPEG, AVIF and WebP are also supported
     // encoding in libuv thread pool, non-blocking
-    await fs.promises.writeFile(('/tmp/out.png'), pngData);
-    // '/tmp/out.png'
+    const fileName = `out_${Date.now()}.png`;
+    await fs.promises.writeFile((`/tmp/${fileName}`), pngData);
     // join(__dirname,'out.png')
-    return join('/tmp/out.png');
+    return join(`/tmp/${fileName}`);
 }
 
 // Load in the 'Inter' font
@@ -759,7 +759,16 @@ app.get('/api/generate', async (req, res) => {
         const primaryColor = '#' + primarycolor;
         const secondaryColor = '#' + secondarycolor;
         const imagePath = await drawProfile(uid, primaryColor, secondaryColor);
-        res.sendFile(imagePath);
+
+        res.sendFile(imagePath, (err) => {
+            if (!err) {
+                // If there was no error sending the file, delete it from the server
+                fs.unlink(imagePath, (err) => {
+                    if (err) console.error(`Error deleting file ${imagePath}:`, err);
+                });
+            }
+        });
+
     } catch (error) {
         res.status(500).json({ message: 'An error occurred:', error: error.toString() });
     }
