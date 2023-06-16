@@ -737,8 +737,13 @@ async function drawProfile(UID, primaryColor, secondaryColor) {
     const pngData = await canvas.encode('png') // JPEG, AVIF and WebP are also supported
     // encoding in libuv thread pool, non-blocking
     await fs.promises.writeFile(('/tmp/out.png'), pngData);
+    // '/tmp/out.png'
+    // 'join(__dirname,'out.png')
     return join('/tmp/out.png');
 }
+
+// Load in the 'Inter' font
+app.use(express.static(join(__dirname, 'fonts')));
 
 app.get('/api/generate', async (req, res) => {
     const { uid, primarycolor, secondarycolor } = req.query;
@@ -753,7 +758,7 @@ app.get('/api/generate', async (req, res) => {
     }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
