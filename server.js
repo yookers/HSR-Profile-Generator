@@ -782,7 +782,9 @@ async function drawProfile(UID, characterIndex, primaryColor, secondaryColor, sh
 
     // If the character is not in the cache, generate the color palette and add it to the cache
     if (!primaryColor && !secondaryColor) {
-        const palette = await checkColorCache(characterData.character_id, `${ASSETS_BASE_URL}${characterData.character_icon_url}`);
+        //const palette = await checkColorCache(characterData.character_id, `${ASSETS_BASE_URL}${characterData.character_icon_url}`);
+        // For now just generate a new color palette every time until proper caching is implemented
+        const palette = await generateColorPalette(`${ASSETS_BASE_URL}${characterData.character_icon_url}`);
         primaryColor = palette.primaryColor;
         secondaryColor = palette.secondaryColor;
     }
@@ -824,7 +826,7 @@ app.get('/api/generate', async (req, res) => {
         // Append '#' to the color codes
         const showWatermark = showwatermark !== 'false';
         const showUID = showuid !== 'false';
-        const characterIndex = characterselection;
+        const characterIndex = characterselection ? characterselection : 0;
         // Append '#' to color codes if they are not null
         const primaryColor = primarycolor ? `#${primarycolor}` : null;
         const secondaryColor = secondarycolor ? `#${secondarycolor}` : null;
