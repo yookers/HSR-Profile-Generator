@@ -311,22 +311,27 @@ async function drawCharacterStats(characterAttributesData, characterAdditionsDat
 async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColor) {
     // Left side, loop to draw 4 relics with height padding
     for (let i = 0; i < 4; i++) {
+
         // Draw 4px border outside relic box
         ctx.strokeStyle = secondaryColor;
         ctx.fillRect(RELIC_LEFT_ITEM_TL_X - 4, RELIC_LEFT_ITEM_TL_Y - 4 + (i * RELIC_HEIGHT_PADDING), RELIC_ITEM_DIMENSIONS + 8, RELIC_ITEM_DIMENSIONS + 8);
         // Relic item box
         ctx.fillStyle = primaryColor;
         ctx.fillRect(RELIC_LEFT_ITEM_TL_X, RELIC_LEFT_ITEM_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_ITEM_DIMENSIONS, RELIC_ITEM_DIMENSIONS);
-        // Picture from URL
-        const relicImage = await loadImage(`${ASSETS_BASE_URL}${relicsData[i].icon_url}`);
-        // Resize to 96px
-        ctx.drawImage(relicImage, RELIC_LEFT_ITEM_TL_X + 16, RELIC_LEFT_ITEM_TL_Y + 16 + (i * RELIC_HEIGHT_PADDING), 96, 96);
+        try {
+            // Picture from URL
+            const relicImage = await loadImage(`${ASSETS_BASE_URL}${relicsData[i].icon_url}`);
+            // Resize to 96px
+            ctx.drawImage(relicImage, RELIC_LEFT_ITEM_TL_X + 16, RELIC_LEFT_ITEM_TL_Y + 16 + (i * RELIC_HEIGHT_PADDING), 96, 96);
+            // Draw relic stats
+            await drawRelicStats(relicsData[i], i, 'left', primaryColor, secondaryColor);
+        }
+        catch {
+            console.log(`Relic ${i + 1} not found.`);
+        }
         // Relic box tag
         ctx.fillStyle = secondaryColor;
         ctx.fillRect(RELIC_LEFT_TAG_TL_X, RELIC_LEFT_TAG_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
-
-        // Draw relic stats
-        await drawRelicStats(relicsData[i], i, 'left', primaryColor, secondaryColor);
     }
 
     // Right side, loop to draw 1 lc + 2 relics with height padding
@@ -338,15 +343,20 @@ async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColo
         // Relic item box
         ctx.fillStyle = primaryColor;
         ctx.fillRect(RELIC_RIGHT_ITEM_TL_X, RELIC_RIGHT_ITEM_TL_Y + (i * RELIC_HEIGHT_PADDING), 128, 128);
-        // Picture from URL
-        const relicImage = await loadImage(`${ASSETS_BASE_URL}${relicsData[i + 3].icon_url}`);
-        // Resize to 96px
-        ctx.drawImage(relicImage, RELIC_RIGHT_ITEM_TL_X + 16, RELIC_RIGHT_ITEM_TL_Y + 16 + (i * RELIC_HEIGHT_PADDING), 96, 96);
+        try {
+            // Picture from URL
+            const relicImage = await loadImage(`${ASSETS_BASE_URL}${relicsData[i + 3].icon_url}`);
+            // Resize to 96px
+            ctx.drawImage(relicImage, RELIC_RIGHT_ITEM_TL_X + 16, RELIC_RIGHT_ITEM_TL_Y + 16 + (i * RELIC_HEIGHT_PADDING), 96, 96);
+            // Draw relic stats
+            await drawRelicStats(relicsData[i + 3], i, 'right', primaryColor, secondaryColor);
+        }
+        catch {
+            console.log(`Relic ${i + 4} not found.`);
+        }
         // Relic box tag
         ctx.fillStyle = secondaryColor;
         ctx.fillRect(RELIC_RIGHT_TAG_TL_X, RELIC_RIGHT_TAG_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
-
-        await drawRelicStats(relicsData[i + 3], i, 'right', primaryColor, secondaryColor);
     }
 }
 
@@ -421,40 +431,44 @@ async function drawLightCone(lightConeData, primaryColor, secondaryColor) {
     // Lightcone item box
     ctx.fillStyle = primaryColor;
     ctx.fillRect(RELIC_RIGHT_ITEM_TL_X, RELIC_RIGHT_ITEM_TL_Y, 128, 128);
-    // Picture from URL
-    const lightConeImage = await loadImage(`${ASSETS_BASE_URL}${lightConeData.lightcone_preview_url}`);
-    // Resize to 112px
-    ctx.drawImage(lightConeImage, RELIC_RIGHT_ITEM_TL_X + 8, RELIC_RIGHT_ITEM_TL_Y + 8, 112, 112);
-    // Lightcone box tag
-    ctx.fillStyle = secondaryColor;
-    ctx.fillRect(RELIC_RIGHT_TAG_TL_X, RELIC_RIGHT_TAG_TL_Y, RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
-    // Lightcone box tag text (center aligned)
-    ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLER} ${FONT_FAMILY}`;
-    ctx.textAlign = 'center';
-    ctx.fillStyle = primaryColor;
-    ctx.fillText(`S${lightConeData.lightcone_rank}`, RELIC_RIGHT_TAG_TEXT_TL_X, RELIC_RIGHT_TAG_TEXT_TL_Y);
-    ctx.textAlign = 'left';
-    // Lightcone name highlight box
-    ctx.fillStyle = secondaryColor;
-    ctx.fillRect(RELIC_RIGHT_STAT_BAR_TL_X, RELIC_RIGHT_STAT_BAR_TL_Y, RELIC_STAT_BAR_WIDTH, RELIC_STAT_BAR_HEIGHT);
-    // Lightcone name
-    ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
-    ctx.fillStyle = primaryColor;
-    ctx.fillText(`${shortenString(lightConeData.lightcone_name, 20)}`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y);
-    // Lightcone stats
-    ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
-    ctx.fillStyle = secondaryColor;
-    ctx.fillText(`Level`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + RELIC_STAT_LINE_HEIGHT);
-    ctx.fillText(`HP`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (RELIC_STAT_LINE_HEIGHT * 2));
-    ctx.fillText(`ATK`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (RELIC_STAT_LINE_HEIGHT * 3));
-    ctx.fillText(`DEF`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (RELIC_STAT_LINE_HEIGHT * 4));
-    // Lightcone stat values (right aligned)
-    ctx.textAlign = 'right';
-    ctx.fillText(`${lightConeData.lightcone_level}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + RELIC_STAT_LINE_HEIGHT);
-    ctx.fillText(`${lightConeData.lightcone_hp}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (RELIC_STAT_LINE_HEIGHT * 2));
-    ctx.fillText(`${lightConeData.lightcone_atk}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (RELIC_STAT_LINE_HEIGHT * 3));
-    ctx.fillText(`${lightConeData.lightcone_def}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (RELIC_STAT_LINE_HEIGHT * 4));
-    ctx.textAlign = 'left';
+    try {
+        // Picture from URL
+        const lightConeImage = await loadImage(`${ASSETS_BASE_URL}${lightConeData.lightcone_preview_url}`);
+        // Resize to 112px
+        ctx.drawImage(lightConeImage, RELIC_RIGHT_ITEM_TL_X + 8, RELIC_RIGHT_ITEM_TL_Y + 8, 112, 112);
+        // Lightcone box tag
+        ctx.fillStyle = secondaryColor;
+        ctx.fillRect(RELIC_RIGHT_TAG_TL_X, RELIC_RIGHT_TAG_TL_Y, RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
+        // Lightcone box tag text (center aligned)
+        ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLER} ${FONT_FAMILY}`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = primaryColor;
+        ctx.fillText(`S${lightConeData.lightcone_rank}`, RELIC_RIGHT_TAG_TEXT_TL_X, RELIC_RIGHT_TAG_TEXT_TL_Y);
+        ctx.textAlign = 'left';
+        // Lightcone name highlight box
+        ctx.fillStyle = secondaryColor;
+        ctx.fillRect(RELIC_RIGHT_STAT_BAR_TL_X, RELIC_RIGHT_STAT_BAR_TL_Y, RELIC_STAT_BAR_WIDTH, RELIC_STAT_BAR_HEIGHT);
+        // Lightcone name
+        ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
+        ctx.fillStyle = primaryColor;
+        ctx.fillText(`${shortenString(lightConeData.lightcone_name, 20)}`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y);
+        // Lightcone stats
+        ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
+        ctx.fillStyle = secondaryColor;
+        ctx.fillText(`Level`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + RELIC_STAT_LINE_HEIGHT);
+        ctx.fillText(`HP`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (RELIC_STAT_LINE_HEIGHT * 2));
+        ctx.fillText(`ATK`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (RELIC_STAT_LINE_HEIGHT * 3));
+        ctx.fillText(`DEF`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (RELIC_STAT_LINE_HEIGHT * 4));
+        // Lightcone stat values (right aligned)
+        ctx.textAlign = 'right';
+        ctx.fillText(`${lightConeData.lightcone_level}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + RELIC_STAT_LINE_HEIGHT);
+        ctx.fillText(`${lightConeData.lightcone_hp}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (RELIC_STAT_LINE_HEIGHT * 2));
+        ctx.fillText(`${lightConeData.lightcone_atk}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (RELIC_STAT_LINE_HEIGHT * 3));
+        ctx.fillText(`${lightConeData.lightcone_def}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (RELIC_STAT_LINE_HEIGHT * 4));
+        ctx.textAlign = 'left';
+    } catch {
+        console.log('Lightcone not found.');
+    }
 }
 
 async function drawBottom(uid, level, achievementCount, primaryColor, showUID) {
@@ -740,7 +754,6 @@ function addBaseValueFloat(characterAdditionsData, baseValue, additionKey) {
 // Uses 'node-vibrant' to generate a color palette from an image
 async function generateColorPalette(imageURL) {
     const palette = await Vibrant.from(imageURL).getPalette();
-    console.log(palette);
 
     const primaryColor = rgbToHex(palette.DarkVibrant._rgb);
     const secondaryColor = rgbToHex(palette.LightMuted._rgb);
