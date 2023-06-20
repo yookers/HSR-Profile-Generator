@@ -6,6 +6,10 @@ const { join } = require('path');
 const express = require('express')
 const app = express()
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
+const Vibrant = require('node-vibrant');
+
+// Set 'true' to enable local debug mode
+const LOCAL_DEBUG = false;
 
 // Register the 'Inter' font
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Regular.ttf'), 'Inter-Regular');
@@ -14,7 +18,7 @@ GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-SemiBold.ttf'), 'In
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Bold.ttf'), 'Inter-Bold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-ExtraBold.ttf'), 'Inter-ExtraBold');
 
-const FONT_FAMILY = 'Inter';
+const FONT_FAMILY = 'Inter, Noto Sans JP, Noto Sans SC, sans-serif';
 const FONT_MEDIUM = '500';
 const FONT_SEMIBOLD = '600';
 const FONT_BOLD = '700';
@@ -89,6 +93,9 @@ const CHARACTER_ART_TL_X = 1027;
 const CHARACTER_ART_TL_Y = 204;
 const CHARACTER_ART_WIDTH = 490;
 const CHARACTER_ART_HEIGHT = 312;
+const CHARACTER_ART_SCALE_RATIO = 0.8;
+const CHARACTER_ART_CROP_X_OFFSET = 0;
+const CHARACTER_ART_CROP_Y_OFFSET = 10;
 // Character eidolon tag dimensions and position
 const CHARACTER_EIDOLON_TAG_TL_X = CHARACTER_ART_TL_X;
 const CHARACTER_EIDOLON_TAG_TL_Y = CHARACTER_ART_TL_Y;
@@ -100,7 +107,13 @@ const CHARACTER_EIDOLON_TAG_TEXT_TL_Y = CHARACTER_EIDOLON_TAG_TL_Y + 5;
 // Character name text position (right aligned)
 const CHARACTER_NAME_TL_X = 1517;
 const CHARACTER_NAME_TL_Y = 145;
-
+// Character path and element position
+const CHARACTER_ELEMENT_TL_X = 1430;
+const CHARACTER_ELEMENT_TL_Y = 226;
+const CHARACTER_PATH_TL_X = 1430;
+const CHARACTER_PATH_TL_Y = 318;
+const CHARACTER_ELEMENT_DIMENSIONS = 80;
+const CHARACTER_PATH_DIMENSIONS = 80;
 // Character level highlight bar
 const CHARACTER_LEVEL_BAR_TL_X = 1023;
 const CHARACTER_LEVEL_BAR_TL_Y = 520;
@@ -174,7 +187,8 @@ async function drawBackground(primaryColor, secondaryColor) {
 async function drawHeader(name, secondaryColor) {
     ctx.font = `${FONT_BOLD} ${FONT_SIZE_BIGGEST} ${FONT_FAMILY}`;
     ctx.fillStyle = secondaryColor;
-
+    // Remove HTML tags
+    name = name.replace(/<\/?[^>]+(>|$)/g, "");
     ctx.fillText(`${name}`, PLAYER_NAME_TL_X, PLAYER_NAME_TL_Y);
 }
 
@@ -209,8 +223,11 @@ async function drawCharacterWindow(characterData, primaryColor, secondaryColor) 
     ctx.fillStyle = secondaryColor;
     ctx.fillRect(CHARACTER_ART_TL_X - 4, CHARACTER_ART_TL_Y - 4, CHARACTER_ART_WIDTH + 8, CHARACTER_ART_HEIGHT + 8);
     // Character picture
-    const characterPicture = await cropImage(characterData.character_icon_url, CHARACTER_ART_WIDTH, CHARACTER_ART_HEIGHT, 0, 10);
+    const characterPicture = await cropImage(characterData.character_icon_url, CHARACTER_ART_WIDTH, CHARACTER_ART_HEIGHT, CHARACTER_ART_SCALE_RATIO, CHARACTER_ART_CROP_X_OFFSET, CHARACTER_ART_CROP_Y_OFFSET);
     ctx.drawImage(characterPicture, CHARACTER_ART_TL_X, CHARACTER_ART_TL_Y, CHARACTER_ART_WIDTH, CHARACTER_ART_HEIGHT);
+    // Character path and element
+    ctx.drawImage(await colorImage(`${ASSETS_BASE_URL}${characterData.character_path_icon_url}`, primaryColor), CHARACTER_PATH_TL_X, CHARACTER_PATH_TL_Y, CHARACTER_PATH_DIMENSIONS, CHARACTER_PATH_DIMENSIONS);
+    ctx.drawImage(await colorImage(`${ASSETS_BASE_URL}${characterData.character_element_icon_url}`, primaryColor), CHARACTER_ELEMENT_TL_X, CHARACTER_ELEMENT_TL_Y, CHARACTER_ELEMENT_DIMENSIONS, CHARACTER_ELEMENT_DIMENSIONS);
     // Character name
     ctx.font = `${FONT_BOLD} ${FONT_SIZE_BIG} ${FONT_FAMILY}`;
     ctx.fillStyle = secondaryColor;
@@ -440,11 +457,12 @@ async function drawLightCone(lightConeData, primaryColor, secondaryColor) {
     ctx.textAlign = 'left';
 }
 
-async function drawBottom(uid, level, achievementCount, primaryColor) {
+async function drawBottom(uid, level, achievementCount, primaryColor, showUID) {
     ctx.font = `${FONT_BOLD} ${FONT_SIZE_NORMAL} ${FONT_FAMILY}`;
     ctx.fillStyle = primaryColor;
-
-    ctx.fillText(`UID: ${uid}`, UID_TL_X, UID_TL_Y);
+    if (showUID) {
+        ctx.fillText(`UID: ${uid}`, UID_TL_X, UID_TL_Y);
+    }
     // Text should align to the right
     ctx.textAlign = 'right';
     ctx.fillText(`Level: ${level}  |  Achievements: ${achievementCount}`, LEVEL_TL_X, LEVEL_TL_Y);
@@ -457,7 +475,7 @@ async function drawWatermark(secondaryColor) {
     ctx.fillText('Meow Completionists', WATERMARK_TL_X, WATERMARK_TL_Y);
 
     ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_WATERMARK} ${FONT_FAMILY}`;
-    ctx.fillText('discord.gg/chives', WATERMARK_TL_X, WATERMARK_TL_Y + WATERMARK_LINE_HEIGHT);
+    ctx.fillText('@yookers | discord.gg/chives', WATERMARK_TL_X, WATERMARK_TL_Y + WATERMARK_LINE_HEIGHT);
 }
 
 async function drawExtras(primaryColor, secondaryColor) {
@@ -483,8 +501,10 @@ function extractCharacterData(character_jsonData) {
     const character_icon_url = character.icon;
     const character_portrait_url = character.portrait;
     const character_preview_url = character.preview;
+    const character_path_icon_url = character.path.icon;
+    const character_element_icon_url = character.element.icon;
 
-    return { character_id, character_name, character_rank, character_level, character_icon_url, character_portrait_url, character_preview_url }
+    return { character_id, character_name, character_rank, character_level, character_icon_url, character_portrait_url, character_preview_url, character_path_icon_url, character_element_icon_url }
 }
 
 function extractCharacterSkillsData(character_jsonData) {
@@ -561,14 +581,15 @@ function extractLightConeData(character_jsonData) {
     return { lightcone_id, lightcone_name, lightcone_rank, lightcone_level, lightcone_preview_url, lightcone_hp, lightcone_atk, lightcone_def };
 }
 
-async function cropImage(image_url, targetWidth, targetHeight, xOffset = 0, yOffset = 0) {
+async function cropImage(image_url, targetWidth, targetHeight, scaleFactor, xOffset = 0, yOffset = 0) {
     const image = await loadImage(`${ASSETS_BASE_URL}${image_url}`);
 
-    const scaleRatio = targetWidth / image.width;
+    const scaleRatio = targetWidth / image.width * scaleFactor;
+    const scaledWidth = image.width * scaleRatio;
     const scaledHeight = image.height * scaleRatio;
 
     // Create a canvas to hold the resized image
-    const scaledCanvas = createCanvas(targetWidth, scaledHeight);
+    const scaledCanvas = createCanvas(scaledWidth, scaledHeight);
     const scaledCtx = scaledCanvas.getContext('2d');
 
     scaledCtx.drawImage(
@@ -576,7 +597,7 @@ async function cropImage(image_url, targetWidth, targetHeight, xOffset = 0, yOff
         0, 0, // Draw the image at 0,0 on the canvas
         image.width, image.height, // Original image size
         0, 0, // Place it at 0,0 on the new canvas
-        targetWidth, scaledHeight // Resize image size on the new canvas
+        scaledWidth, scaledHeight // Resize image size on the new canvas
     );
 
     // Now create another canvas to hold the final cropped image
@@ -690,6 +711,14 @@ function prependZero(str) {
     return str;
 }
 
+// Helper function to convert RGB to Hex, RBG format is [r, g, b]
+function rgbToHex(rgb) {
+    return '#' + rgb.map(x => {
+        const hex = Math.round(x).toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
+}
+
 function addBaseValue(characterAdditionsData, baseValue, additionKey) {
     let base = parseInt(baseValue, 10);
     if (characterAdditionsData[additionKey]) {
@@ -708,28 +737,55 @@ function addBaseValueFloat(characterAdditionsData, baseValue, additionKey) {
     return base;
 }
 
-async function getPrimaryColor() {
+// Uses 'node-vibrant' to generate a color palette from an image
+async function generateColorPalette(imageURL) {
+    const palette = await Vibrant.from(imageURL).getPalette();
+    console.log(palette);
 
+    const primaryColor = rgbToHex(palette.DarkVibrant._rgb);
+    const secondaryColor = rgbToHex(palette.LightMuted._rgb);
+
+    return { primaryColor, secondaryColor };
 }
 
-async function getSecondaryColor() {
+async function checkColorCache(characterID, imageURL) {
+    let colorsData = JSON.parse(fs.readFileSync(join(__dirname, 'default-colors.json')));
+    if (!colorsData[characterID]) {
+        const { primaryColor, secondaryColor } = await generateColorPalette(imageURL);
 
+        colorsData[characterID] = {
+            primaryColor,
+            secondaryColor
+        };
+
+        fs.writeFileSync(join(__dirname, 'default-colors.json'), JSON.stringify(colorsData, null, 2));
+    }
+
+    return colorsData[characterID];
 }
 
-async function drawProfile(UID, primaryColor, secondaryColor) {
+async function drawProfile(UID, characterIndex, primaryColor, secondaryColor, showWatermark, showUID, localDebugToggle = false) {
     // Get JSON data from API
     const response = await fetch(`${API_BASE_URL_PREPEND}${UID}${API_BASE_URL_APPEND}`);
     const jsonData = await response.json();
     // Get JSON data from local file
-    //const rawData = await fs.promises.readFile(LOCAL_TEST_JSON, 'utf-8');
+    //const rawData = await fs.promises.readFile(LOCAL_TEST_JSON);
     //const jsonData = JSON.parse(rawData);
     const playerData = extractPlayerData(jsonData);
-    const characterData = extractCharacterData(jsonData.characters[0]);
-    const characterSkillsData = extractCharacterSkillsData(jsonData.characters[0]);
-    const characterAttributesData = extractCharacterAttributesData(jsonData.characters[0]);
-    const characterAdditionsData = sortAdditions(extractCharacterAdditionsData(jsonData.characters[0]));
-    const relicsData = shortenStatName(extractRelicData(jsonData.characters[0]));
-    const lightConeData = extractLightConeData(jsonData.characters[0]);
+    const characterSelection = jsonData.characters[characterIndex]
+    const characterData = extractCharacterData(characterSelection);
+    const characterSkillsData = extractCharacterSkillsData(characterSelection);
+    const characterAttributesData = extractCharacterAttributesData(characterSelection);
+    const characterAdditionsData = sortAdditions(extractCharacterAdditionsData(characterSelection));
+    const relicsData = shortenStatName(extractRelicData(characterSelection));
+    const lightConeData = extractLightConeData(characterSelection);
+
+    // If the character is not in the cache, generate the color palette and add it to the cache
+    if (!primaryColor && !secondaryColor) {
+        const palette = await checkColorCache(characterData.character_id, `${ASSETS_BASE_URL}${characterData.character_icon_url}`);
+        primaryColor = palette.primaryColor;
+        secondaryColor = palette.secondaryColor;
+    }
 
     await drawBackground(primaryColor, secondaryColor);
     await drawHeader(playerData.player_nickname, secondaryColor);
@@ -737,16 +793,21 @@ async function drawProfile(UID, primaryColor, secondaryColor) {
     await drawCharacterSkills(characterSkillsData, primaryColor, secondaryColor);
     await drawCharacterWindow(characterData, primaryColor, secondaryColor);
     await drawCharacterStats(characterAttributesData, characterAdditionsData, secondaryColor);
-    await drawWatermark(secondaryColor);
-    await drawBottom(playerData.player_uid, playerData.player_level, playerData.player_achievement_count, primaryColor);
+    if (showWatermark) {
+        await drawWatermark(secondaryColor);
+    }
+    await drawBottom(playerData.player_uid, playerData.player_level, playerData.player_achievement_count, primaryColor, showUID);
     //await drawExtras(primaryColor, secondaryColor);
 
     const pngData = await canvas.encode('png') // JPEG, AVIF and WebP are also supported
     // encoding in libuv thread pool, non-blocking
+
+    if (localDebugToggle) {
+        await fs.promises.writeFile(join(__dirname, 'out.png'), pngData);
+        return join(__dirname, 'out.png');
+    }
     const fileName = `out_${Date.now()}.png`;
     await fs.promises.writeFile((`/tmp/${fileName}`), pngData);
-    // join(__dirname,'out.png')
-    // `/tmp/${fileName}`
     return join(`/tmp/${fileName}`);
 }
 
@@ -754,15 +815,20 @@ async function drawProfile(UID, primaryColor, secondaryColor) {
 app.use(express.static(join(__dirname, 'fonts')));
 
 // TODO: Show Relic star level (3, 4, 5 star)
-// TODO: Have an option to hide UID
+// TODO: Display region of player
+// TODO: Display relic score
 
 app.get('/api/generate', async (req, res) => {
-    const { uid, primarycolor, secondarycolor } = req.query;
+    const { uid, characterselection, primarycolor, secondarycolor, showwatermark, showuid } = req.query;
     try {
         // Append '#' to the color codes
-        const primaryColor = '#' + primarycolor;
-        const secondaryColor = '#' + secondarycolor;
-        const imagePath = await drawProfile(uid, primaryColor, secondaryColor);
+        const showWatermark = showwatermark !== 'false';
+        const showUID = showuid !== 'false';
+        const characterIndex = characterselection;
+        // Append '#' to color codes if they are not null
+        const primaryColor = primarycolor ? `#${primarycolor}` : null;
+        const secondaryColor = secondarycolor ? `#${secondarycolor}` : null;
+        const imagePath = await drawProfile(uid, characterIndex, primaryColor, secondaryColor, showWatermark, showUID, LOCAL_DEBUG);
 
         res.sendFile(imagePath, (err) => {
             if (!err) {

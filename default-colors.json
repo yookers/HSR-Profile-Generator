@@ -1,0 +1,34 @@
+{
+  "1003": {
+    "primaryColor": "#781a1a",
+    "secondaryColor": "#d9b8b8"
+  },
+  "1004": {
+    "primaryColor": "#773f0d",
+    "secondaryColor": "#ccaca3"
+  },
+  "1006": {
+    "primaryColor": "#2c2e77",
+    "secondaryColor": "#cc9e9d"
+  },
+  "1101": {
+    "primaryColor": "#2f3969",
+    "secondaryColor": "#d6b2c0"
+  },
+  "1102": {
+    "primaryColor": "#2c1476",
+    "secondaryColor": "#be9fd2"
+  },
+  "1107": {
+    "primaryColor": "#6a1c2b",
+    "secondaryColor": "#c7afb6"
+  },
+  "1204": {
+    "primaryColor": "#9f403c",
+    "secondaryColor": "#d5c5af"
+  },
+  "1209": {
+    "primaryColor": "#411426",
+    "secondaryColor": "#d1bca6"
+  }
+}
