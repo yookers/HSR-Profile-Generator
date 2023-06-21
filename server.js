@@ -17,8 +17,10 @@ GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Medium.ttf'), 'Inte
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-SemiBold.ttf'), 'Inter-SemiBold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Bold.ttf'), 'Inter-Bold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-ExtraBold.ttf'), 'Inter-ExtraBold');
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansJP-Bold.ttf'), 'NotoSansJP-Bold');
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansSC-Bold.otf'), 'NotoSansSC-Bold');
 
-const FONT_FAMILY = 'Inter, Noto Sans JP, Noto Sans SC, sans-serif';
+const FONT_FAMILY = 'Inter, Noto Sans SC, Noto Sans JP, sans-serif';
 const FONT_MEDIUM = '500';
 const FONT_SEMIBOLD = '600';
 const FONT_BOLD = '700';
@@ -361,65 +363,69 @@ async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColo
 }
 
 async function drawRelicStats(relicData, i, side, primaryColor, secondaryColor) {
-    if (side === 'left') {
-        // Relic main stat hightlight box
-        ctx.fillStyle = secondaryColor;
-        ctx.fillRect(RELIC_LEFT_STAT_BAR_TL_X, RELIC_LEFT_STAT_BAR_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_STAT_BAR_WIDTH, RELIC_STAT_BAR_HEIGHT);
+    try {
+        if (side === 'left') {
+            // Relic main stat hightlight box
+            ctx.fillStyle = secondaryColor;
+            ctx.fillRect(RELIC_LEFT_STAT_BAR_TL_X, RELIC_LEFT_STAT_BAR_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_STAT_BAR_WIDTH, RELIC_STAT_BAR_HEIGHT);
 
-        // Relic tag text
-        ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLER} ${FONT_FAMILY}`;
-        ctx.fillStyle = primaryColor;
-        ctx.textAlign = 'center';
-        const relicLevel = prependZero(relicData.level);
-        ctx.fillText(`+${relicLevel}`, RELIC_LEFT_TAG_TEXT_TL_X, RELIC_LEFT_TAG_TEXT_TL_Y + (i * RELIC_HEIGHT_PADDING));
+            // Relic tag text
+            ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLER} ${FONT_FAMILY}`;
+            ctx.fillStyle = primaryColor;
+            ctx.textAlign = 'center';
+            const relicLevel = prependZero(relicData.level);
+            ctx.fillText(`+${relicLevel}`, RELIC_LEFT_TAG_TEXT_TL_X, RELIC_LEFT_TAG_TEXT_TL_Y + (i * RELIC_HEIGHT_PADDING));
 
-        // Relic main stat name
-        ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
-        ctx.fillStyle = primaryColor;
-        ctx.textAlign = 'left';
-        ctx.fillText(`${relicData.main_affix.name}`, RELIC_LEFT_STAT_NAME_TL_X, RELIC_LEFT_STAT_NAME_TL_Y + (i * RELIC_HEIGHT_PADDING));
-        // Relic main stat value
-        ctx.textAlign = 'right';
-        ctx.fillText(`${relicData.main_affix.display}`, RELIC_LEFT_STAT_VALUE_TL_X, RELIC_LEFT_STAT_VALUE_TL_Y + (i * RELIC_HEIGHT_PADDING));
-        // Draw every sub stat
-        ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
-        ctx.fillStyle = secondaryColor;
-        for (let j = 0; j < relicData.sub_affix.length; j++) {
+            // Relic main stat name
+            ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
+            ctx.fillStyle = primaryColor;
             ctx.textAlign = 'left';
-            ctx.fillText(`${relicData.sub_affix[j].name}`, RELIC_LEFT_STAT_NAME_TL_X, RELIC_LEFT_STAT_NAME_TL_Y + (i * RELIC_HEIGHT_PADDING) + RELIC_STAT_LINE_HEIGHT * (j + 1));
+            ctx.fillText(`${relicData.main_affix.name}`, RELIC_LEFT_STAT_NAME_TL_X, RELIC_LEFT_STAT_NAME_TL_Y + (i * RELIC_HEIGHT_PADDING));
+            // Relic main stat value
             ctx.textAlign = 'right';
-            ctx.fillText(`${relicData.sub_affix[j].display}`, RELIC_LEFT_STAT_VALUE_TL_X, RELIC_LEFT_STAT_VALUE_TL_Y + (i * RELIC_HEIGHT_PADDING) + RELIC_STAT_LINE_HEIGHT * (j + 1));
+            ctx.fillText(`${relicData.main_affix.display}`, RELIC_LEFT_STAT_VALUE_TL_X, RELIC_LEFT_STAT_VALUE_TL_Y + (i * RELIC_HEIGHT_PADDING));
+            // Draw every sub stat
+            ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
+            ctx.fillStyle = secondaryColor;
+            for (let j = 0; j < relicData.sub_affix.length; j++) {
+                ctx.textAlign = 'left';
+                ctx.fillText(`${relicData.sub_affix[j].name}`, RELIC_LEFT_STAT_NAME_TL_X, RELIC_LEFT_STAT_NAME_TL_Y + (i * RELIC_HEIGHT_PADDING) + RELIC_STAT_LINE_HEIGHT * (j + 1));
+                ctx.textAlign = 'right';
+                ctx.fillText(`${relicData.sub_affix[j].display}`, RELIC_LEFT_STAT_VALUE_TL_X, RELIC_LEFT_STAT_VALUE_TL_Y + (i * RELIC_HEIGHT_PADDING) + RELIC_STAT_LINE_HEIGHT * (j + 1));
+            }
         }
-    }
-    if (side === 'right') {
-        // Relic main stat hightlight box
-        ctx.fillStyle = secondaryColor;
-        ctx.fillRect(RELIC_RIGHT_STAT_BAR_TL_X, RELIC_RIGHT_STAT_BAR_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_STAT_BAR_WIDTH, RELIC_STAT_BAR_HEIGHT);
+        if (side === 'right') {
+            // Relic main stat hightlight box
+            ctx.fillStyle = secondaryColor;
+            ctx.fillRect(RELIC_RIGHT_STAT_BAR_TL_X, RELIC_RIGHT_STAT_BAR_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_STAT_BAR_WIDTH, RELIC_STAT_BAR_HEIGHT);
 
-        // Relic tag text
-        ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLER} ${FONT_FAMILY}`;
-        ctx.fillStyle = primaryColor;
-        ctx.textAlign = 'center';
-        const relicLevel = prependZero(relicData.level);
-        ctx.fillText(`+${relicLevel}`, RELIC_RIGHT_TAG_TEXT_TL_X, RELIC_RIGHT_TAG_TEXT_TL_Y + (i * RELIC_HEIGHT_PADDING));
+            // Relic tag text
+            ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLER} ${FONT_FAMILY}`;
+            ctx.fillStyle = primaryColor;
+            ctx.textAlign = 'center';
+            const relicLevel = prependZero(relicData.level);
+            ctx.fillText(`+${relicLevel}`, RELIC_RIGHT_TAG_TEXT_TL_X, RELIC_RIGHT_TAG_TEXT_TL_Y + (i * RELIC_HEIGHT_PADDING));
 
-        // Relic main stat name
-        ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
-        ctx.fillStyle = primaryColor;
-        ctx.textAlign = 'left';
-        ctx.fillText(`${relicData.main_affix.name}`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (i * RELIC_HEIGHT_PADDING));
-        // Relic main stat value
-        ctx.textAlign = 'right';
-        ctx.fillText(`${relicData.main_affix.display}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (i * RELIC_HEIGHT_PADDING));
-        // Draw every sub stat
-        ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
-        ctx.fillStyle = secondaryColor;
-        for (let j = 0; j < relicData.sub_affix.length; j++) {
+            // Relic main stat name
+            ctx.font = `${FONT_BOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
+            ctx.fillStyle = primaryColor;
             ctx.textAlign = 'left';
-            ctx.fillText(`${relicData.sub_affix[j].name}`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (i * RELIC_HEIGHT_PADDING) + RELIC_STAT_LINE_HEIGHT * (j + 1));
+            ctx.fillText(`${relicData.main_affix.name}`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (i * RELIC_HEIGHT_PADDING));
+            // Relic main stat value
             ctx.textAlign = 'right';
-            ctx.fillText(`${relicData.sub_affix[j].display}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (i * RELIC_HEIGHT_PADDING) + RELIC_STAT_LINE_HEIGHT * (j + 1));
+            ctx.fillText(`${relicData.main_affix.display}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (i * RELIC_HEIGHT_PADDING));
+            // Draw every sub stat
+            ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_SMALLEST} ${FONT_FAMILY}`;
+            ctx.fillStyle = secondaryColor;
+            for (let j = 0; j < relicData.sub_affix.length; j++) {
+                ctx.textAlign = 'left';
+                ctx.fillText(`${relicData.sub_affix[j].name}`, RELIC_RIGHT_STAT_NAME_TL_X, RELIC_RIGHT_STAT_NAME_TL_Y + (i * RELIC_HEIGHT_PADDING) + RELIC_STAT_LINE_HEIGHT * (j + 1));
+                ctx.textAlign = 'right';
+                ctx.fillText(`${relicData.sub_affix[j].display}`, RELIC_RIGHT_STAT_VALUE_TL_X, RELIC_RIGHT_STAT_VALUE_TL_Y + (i * RELIC_HEIGHT_PADDING) + RELIC_STAT_LINE_HEIGHT * (j + 1));
+            }
         }
+    } catch (error) {
+        console.error('Error drawing relic occured:', error);
     }
     ctx.textAlign = 'left';
 }
