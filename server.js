@@ -673,6 +673,7 @@ function shortenString(str, maxLength) {
 }
 
 function sortAdditions(additions) {
+    const elements = ['Physical', 'Fire', 'Ice', 'Lightning', 'Wind', 'Quantum', 'Imaginary'];
     // Define the order of the attributes
     const attributeOrder = [
         'HP', 'ATK', 'DEF', 'SPD', 'CRIT Rate', 'CRIT DMG', 'Break Effect',
@@ -691,7 +692,14 @@ function sortAdditions(additions) {
     // Process the additions array
     for (let addition of additions) {
         // If the attribute name contains "DMG Boost", assign it to the "Elemental DMG Boost" key
-        if (addition.name.includes("DMG Boost")) {
+        let isElementalDMGBoost = false;
+        for (let element of elements) {
+            if (addition.name.includes(`${element} DMG Boost`)) {
+                isElementalDMGBoost = true;
+                break;
+            }
+        }
+        if (isElementalDMGBoost) {
             result['Elemental DMG Boost'] = {
                 name: addition.name,
                 icon: addition.icon,
