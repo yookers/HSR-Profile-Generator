@@ -311,7 +311,6 @@ async function drawCharacterStats(characterAttributesData, characterAdditionsDat
 async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColor) {
     // Left side, loop to draw 4 relics with height padding
     for (let i = 0; i < 4; i++) {
-
         // Draw 4px border outside relic box
         ctx.strokeStyle = secondaryColor;
         ctx.fillRect(RELIC_LEFT_ITEM_TL_X - 4, RELIC_LEFT_ITEM_TL_Y - 4 + (i * RELIC_HEIGHT_PADDING), RELIC_ITEM_DIMENSIONS + 8, RELIC_ITEM_DIMENSIONS + 8);
@@ -323,15 +322,15 @@ async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColo
             const relicImage = await loadImage(`${ASSETS_BASE_URL}${relicsData[i].icon_url}`);
             // Resize to 96px
             ctx.drawImage(relicImage, RELIC_LEFT_ITEM_TL_X + 16, RELIC_LEFT_ITEM_TL_Y + 16 + (i * RELIC_HEIGHT_PADDING), 96, 96);
+            // Relic box tag
+            ctx.fillStyle = secondaryColor;
+            ctx.fillRect(RELIC_LEFT_TAG_TL_X, RELIC_LEFT_TAG_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
             // Draw relic stats
             await drawRelicStats(relicsData[i], i, 'left', primaryColor, secondaryColor);
         }
         catch {
             console.log(`Relic ${i + 1} not found.`);
         }
-        // Relic box tag
-        ctx.fillStyle = secondaryColor;
-        ctx.fillRect(RELIC_LEFT_TAG_TL_X, RELIC_LEFT_TAG_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
     }
 
     // Right side, loop to draw 1 lc + 2 relics with height padding
@@ -343,20 +342,21 @@ async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColo
         // Relic item box
         ctx.fillStyle = primaryColor;
         ctx.fillRect(RELIC_RIGHT_ITEM_TL_X, RELIC_RIGHT_ITEM_TL_Y + (i * RELIC_HEIGHT_PADDING), 128, 128);
+
         try {
             // Picture from URL
             const relicImage = await loadImage(`${ASSETS_BASE_URL}${relicsData[i + 3].icon_url}`);
             // Resize to 96px
             ctx.drawImage(relicImage, RELIC_RIGHT_ITEM_TL_X + 16, RELIC_RIGHT_ITEM_TL_Y + 16 + (i * RELIC_HEIGHT_PADDING), 96, 96);
+            // Relic box tag
+            ctx.fillStyle = secondaryColor;
+            ctx.fillRect(RELIC_RIGHT_TAG_TL_X, RELIC_RIGHT_TAG_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
             // Draw relic stats
             await drawRelicStats(relicsData[i + 3], i, 'right', primaryColor, secondaryColor);
         }
         catch {
             console.log(`Relic ${i + 4} not found.`);
         }
-        // Relic box tag
-        ctx.fillStyle = secondaryColor;
-        ctx.fillRect(RELIC_RIGHT_TAG_TL_X, RELIC_RIGHT_TAG_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
     }
 }
 
