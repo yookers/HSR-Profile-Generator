@@ -234,7 +234,9 @@ async function drawCharacterWindow(characterData, primaryColor, secondaryColor) 
     ctx.font = `${FONT_BOLD} ${FONT_SIZE_BIG} ${FONT_FAMILY}`;
     ctx.fillStyle = secondaryColor;
     ctx.textAlign = 'right';
-    ctx.fillText(`${characterData.character_name}`, CHARACTER_NAME_TL_X, CHARACTER_NAME_TL_Y);
+    // Remove HTML tags
+    const characterName = characterData.character_name.replace(/<\/?[^>]+(>|$)/g, "");
+    ctx.fillText(`${characterName}`, CHARACTER_NAME_TL_X, CHARACTER_NAME_TL_Y);
     ctx.textAlign = 'left';
     // Character eidolon tag
     ctx.fillRect(CHARACTER_EIDOLON_TAG_TL_X, CHARACTER_EIDOLON_TAG_TL_Y, CHARACTER_EIDOLON_TAG_WIDTH, CHARACTER_EIDOLON_TAG_HEIGHT);
