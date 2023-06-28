@@ -667,6 +667,9 @@ function shortenStatName(relicData) {
         if (relic.main_affix.name === "Energy Regeneration Rate") {
             relic.main_affix.name = "Energy Regen";
         }
+        if (relic.main_affix.name === "Outgoing Healing Boost") {
+            relic.main_affix.name = "Healing Boost";
+        }
     });
     return relicData;
 }
