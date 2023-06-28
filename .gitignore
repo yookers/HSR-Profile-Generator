@@ -1,3 +1,5 @@
 node_modules/
+canvas-constants.js
+default-colors.js
 out.png
 .vercel
