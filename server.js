@@ -18,6 +18,7 @@ GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-SemiBold.ttf'), 'In
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Bold.ttf'), 'Inter-Bold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-ExtraBold.ttf'), 'Inter-ExtraBold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansJP-Bold.ttf'), 'NotoSansJP-Bold');
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansKR-Bold.ttf'), 'NotoSansKR-Bold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansSC-Bold.otf'), 'NotoSansSC-Bold');
 
 const FONT_FAMILY = 'Inter, Noto Sans SC, Noto Sans JP, sans-serif';
@@ -855,7 +856,6 @@ app.use(express.static(join(__dirname, 'fonts')));
 app.get('/api/generate', async (req, res) => {
     const { uid, characterselection, primarycolor, secondarycolor, showwatermark, showuid } = req.query;
     try {
-        // Append '#' to the color codes
         const showWatermark = showwatermark !== 'false';
         const showUID = showuid !== 'false';
         const characterIndex = characterselection ? characterselection : 0;
