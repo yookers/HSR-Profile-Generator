@@ -18,10 +18,10 @@ GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-SemiBold.ttf'), 'In
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-Bold.ttf'), 'Inter-Bold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'Inter-ExtraBold.ttf'), 'Inter-ExtraBold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansJP-Bold.ttf'), 'NotoSansJP-Bold');
-GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansKR-Bold.ttf'), 'NotoSansKR-Bold');
+GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansKR-Bold.otf'), 'NotoSansKR-Bold');
 GlobalFonts.registerFromPath(join(__dirname, 'fonts', 'NotoSansSC-Bold.otf'), 'NotoSansSC-Bold');
 
-const FONT_FAMILY = 'Inter, Noto Sans SC, Noto Sans JP, sans-serif';
+const FONT_FAMILY = 'Inter, Noto Sans SC, Noto Sans JP, Noto Sans KR, sans-serif';
 const FONT_MEDIUM = '500';
 const FONT_SEMIBOLD = '600';
 const FONT_BOLD = '700';
