@@ -163,13 +163,7 @@ const ASSETS_BASE_URL = 'https://raw.githubusercontent.com/Mar-7th/StarRailRes/m
 const API_BASE_URL_PREPEND = 'https://api.mihomo.me/sr_info_parsed/';
 const API_BASE_URL_APPEND = '?lang=en&version=v2';
 
-const canvas = createCanvas(1600, 1000)
-const ctx = canvas.getContext('2d')
-
-// Easier formatting
-ctx.textBaseline = 'hanging';
-
-async function drawBackground(primaryColor, secondaryColor) {
+async function drawBackground(ctx, canvas, primaryColor, secondaryColor) {
     ctx.fillStyle = primaryColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -184,7 +178,7 @@ async function drawBackground(primaryColor, secondaryColor) {
     ctx.fillRect(0, BACKGROUND_BOTTOM_BAR_TL_Y, canvas.width, BACKGROUND_BOTTOM_BAR_HEIGHT);
 }
 
-async function drawHeader(name, secondaryColor) {
+async function drawHeader(ctx, name, secondaryColor) {
     ctx.font = `${FONT_BOLD} ${FONT_SIZE_BIGGEST} ${FONT_FAMILY}`;
     ctx.fillStyle = secondaryColor;
     // Remove HTML tags
@@ -192,7 +186,7 @@ async function drawHeader(name, secondaryColor) {
     ctx.fillText(`${name}`, PLAYER_NAME_TL_X, PLAYER_NAME_TL_Y);
 }
 
-async function drawCharacterSkills(characterSkillsData, primaryColor, secondaryColor) {
+async function drawCharacterSkills(ctx, characterSkillsData, primaryColor, secondaryColor) {
     const skillText = ['Basic', 'Talent', 'Skill', 'Ultimate'];
     // Loop through each skill
     for (let i = 0; i < 4; i++) {
@@ -218,7 +212,7 @@ async function drawCharacterSkills(characterSkillsData, primaryColor, secondaryC
     ctx.textAlign = 'left';
 }
 
-async function drawCharacterWindow(characterData, primaryColor, secondaryColor) {
+async function drawCharacterWindow(ctx, characterData, primaryColor, secondaryColor) {
     // Draw 4px border outside
     ctx.fillStyle = secondaryColor;
     ctx.fillRect(CHARACTER_ART_TL_X - 4, CHARACTER_ART_TL_Y - 4, CHARACTER_ART_WIDTH + 8, CHARACTER_ART_HEIGHT + 8);
@@ -257,7 +251,7 @@ async function drawCharacterWindow(characterData, primaryColor, secondaryColor) 
     ctx.textAlign = 'left';
 }
 
-async function drawCharacterStats(characterAttributesData, characterAdditionsData, secondaryColor) {
+async function drawCharacterStats(ctx, characterAttributesData, characterAdditionsData, secondaryColor) {
     ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_SMALLER} ${FONT_FAMILY}`;
     ctx.fillStyle = secondaryColor;
 
@@ -310,7 +304,7 @@ async function drawCharacterStats(characterAttributesData, characterAdditionsDat
     ctx.textAlign = 'left';
 }
 
-async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColor) {
+async function drawRelics(ctx, relicsData, lightconeData, primaryColor, secondaryColor) {
     // Left side, loop to draw 4 relics with height padding
     for (let i = 0; i < 4; i++) {
         // Draw 4px border outside relic box
@@ -328,7 +322,7 @@ async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColo
             ctx.fillStyle = secondaryColor;
             ctx.fillRect(RELIC_LEFT_TAG_TL_X, RELIC_LEFT_TAG_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
             // Draw relic stats
-            await drawRelicStats(relicsData[i], i, 'left', primaryColor, secondaryColor);
+            await drawRelicStats(ctx, relicsData[i], i, 'left', primaryColor, secondaryColor);
         }
         catch {
             console.log(`Relic ${i + 1} not found.`);
@@ -336,7 +330,7 @@ async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColo
     }
 
     // Right side, loop to draw 1 lc + 2 relics with height padding
-    await drawLightCone(lightconeData, primaryColor, secondaryColor);
+    await drawLightCone(ctx, lightconeData, primaryColor, secondaryColor);
     for (let i = 1; i < 3; i++) {
         // Draw 4px border outside relic box
         ctx.strokeStyle = secondaryColor;
@@ -354,7 +348,7 @@ async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColo
             ctx.fillStyle = secondaryColor;
             ctx.fillRect(RELIC_RIGHT_TAG_TL_X, RELIC_RIGHT_TAG_TL_Y + (i * RELIC_HEIGHT_PADDING), RELIC_TAG_WIDTH, RELIC_TAG_HEIGHT);
             // Draw relic stats
-            await drawRelicStats(relicsData[i + 3], i, 'right', primaryColor, secondaryColor);
+            await drawRelicStats(ctx, relicsData[i + 3], i, 'right', primaryColor, secondaryColor);
         }
         catch {
             console.log(`Relic ${i + 4} not found.`);
@@ -362,7 +356,7 @@ async function drawRelics(relicsData, lightconeData, primaryColor, secondaryColo
     }
 }
 
-async function drawRelicStats(relicData, i, side, primaryColor, secondaryColor) {
+async function drawRelicStats(ctx, relicData, i, side, primaryColor, secondaryColor) {
     try {
         if (side === 'left') {
             // Relic main stat hightlight box
@@ -430,7 +424,7 @@ async function drawRelicStats(relicData, i, side, primaryColor, secondaryColor) 
     ctx.textAlign = 'left';
 }
 
-async function drawLightCone(lightConeData, primaryColor, secondaryColor) {
+async function drawLightCone(ctx, lightConeData, primaryColor, secondaryColor) {
     // Draw 4px border outside lightcone box
     ctx.fillStyle = secondaryColor;
     ctx.fillRect(RELIC_RIGHT_ITEM_TL_X - 4, RELIC_RIGHT_ITEM_TL_Y - 4, RELIC_ITEM_DIMENSIONS + 8, RELIC_ITEM_DIMENSIONS + 8);
@@ -477,7 +471,7 @@ async function drawLightCone(lightConeData, primaryColor, secondaryColor) {
     }
 }
 
-async function drawBottom(uid, level, achievementCount, primaryColor, showUID) {
+async function drawBottom(ctx, uid, level, achievementCount, primaryColor, showUID) {
     ctx.font = `${FONT_BOLD} ${FONT_SIZE_NORMAL} ${FONT_FAMILY}`;
     ctx.fillStyle = primaryColor;
     if (showUID) {
@@ -489,7 +483,7 @@ async function drawBottom(uid, level, achievementCount, primaryColor, showUID) {
     ctx.textAlign = 'left';
 }
 
-async function drawWatermark(secondaryColor) {
+async function drawWatermark(ctx, secondaryColor) {
     ctx.font = `${FONT_EXTRA_BOLD} ${FONT_SIZE_WATERMARK} ${FONT_FAMILY}`;
     ctx.fillStyle = secondaryColor;
     ctx.fillText('StarDB.GG', WATERMARK_TL_X, WATERMARK_TL_Y);
@@ -498,7 +492,7 @@ async function drawWatermark(secondaryColor) {
     ctx.fillText('@yookers | discord.gg/chives', WATERMARK_TL_X, WATERMARK_TL_Y + WATERMARK_LINE_HEIGHT);
 }
 
-async function drawExtras(primaryColor, secondaryColor) {
+async function drawExtras(ctx, primaryColor, secondaryColor) {
 
 }
 
@@ -778,6 +772,13 @@ async function generateColorPalette(imageURL) {
     return { primaryColor, secondaryColor };
 }
 
+/* async function createUniqueCanvas() {
+    const canvas = createCanvas(1600, 1000);
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = 'hanging';
+    return { canvas, ctx };
+} */
+
 async function checkColorCache(characterID, imageURL) {
     let colorsData = JSON.parse(fs.readFileSync(join(__dirname, 'default-colors.json')));
     if (!colorsData[characterID]) {
@@ -794,7 +795,7 @@ async function checkColorCache(characterID, imageURL) {
     return colorsData[characterID];
 }
 
-async function drawProfile(UID, characterIndex, primaryColor, secondaryColor, showWatermark, showUID, localDebugToggle = false) {
+async function drawProfile(ctx, canvas, UID, characterIndex, primaryColor, secondaryColor, showWatermark, showUID, localDebugToggle = false) {
     // Get JSON data from API
     const response = await fetch(`${API_BASE_URL_PREPEND}${UID}${API_BASE_URL_APPEND}`);
     const jsonData = await response.json();
@@ -819,19 +820,19 @@ async function drawProfile(UID, characterIndex, primaryColor, secondaryColor, sh
         secondaryColor = palette.secondaryColor;
     }
 
-    await drawBackground(primaryColor, secondaryColor);
-    await drawHeader(playerData.player_nickname, secondaryColor);
-    await drawRelics(relicsData, lightConeData, primaryColor, secondaryColor);
-    await drawCharacterSkills(characterSkillsData, primaryColor, secondaryColor);
-    await drawCharacterWindow(characterData, primaryColor, secondaryColor);
-    await drawCharacterStats(characterAttributesData, characterAdditionsData, secondaryColor);
+    await drawBackground(ctx, canvas, primaryColor, secondaryColor);
+    await drawHeader(ctx, playerData.player_nickname, secondaryColor);
+    await drawRelics(ctx, relicsData, lightConeData, primaryColor, secondaryColor);
+    await drawCharacterSkills(ctx, characterSkillsData, primaryColor, secondaryColor);
+    await drawCharacterWindow(ctx, characterData, primaryColor, secondaryColor);
+    await drawCharacterStats(ctx, characterAttributesData, characterAdditionsData, secondaryColor);
     if (showWatermark) {
-        await drawWatermark(secondaryColor);
+        await drawWatermark(ctx, secondaryColor);
     }
-    await drawBottom(playerData.player_uid, playerData.player_level, playerData.player_achievement_count, primaryColor, showUID);
+    await drawBottom(ctx, playerData.player_uid, playerData.player_level, playerData.player_achievement_count, primaryColor, showUID);
     //await drawExtras(primaryColor, secondaryColor);
 
-    const pngData = await canvas.encode('png') // JPEG, AVIF and WebP are also supported
+    const pngData = await canvas.encode('webp') // JPEG, AVIF and WebP are also supported
     // encoding in libuv thread pool, non-blocking
 
     if (localDebugToggle) {
@@ -852,6 +853,11 @@ app.use(express.static(join(__dirname, 'fonts')));
 
 app.get('/api/generate', async (req, res) => {
     const { uid, characterselection, primarycolor, secondarycolor, showwatermark, showuid } = req.query;
+    
+    const canvas = createCanvas(1600, 1000);
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = 'hanging';
+    
     try {
         const showWatermark = showwatermark !== 'false';
         const showUID = showuid !== 'false';
@@ -859,7 +865,7 @@ app.get('/api/generate', async (req, res) => {
         // Append '#' to color codes if they are not null
         const primaryColor = primarycolor ? `#${primarycolor}` : null;
         const secondaryColor = secondarycolor ? `#${secondarycolor}` : null;
-        const imagePath = await drawProfile(uid, characterIndex, primaryColor, secondaryColor, showWatermark, showUID, LOCAL_DEBUG);
+        const imagePath = await drawProfile(ctx, canvas, uid, characterIndex, primaryColor, secondaryColor, showWatermark, showUID, LOCAL_DEBUG);
 
         res.sendFile(imagePath, (err) => {
             if (!err) {
