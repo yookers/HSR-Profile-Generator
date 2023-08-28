@@ -1,6 +1,3 @@
-// Design Iteration #1
-// @Yookers
-
 const fs = require('fs');
 const { join } = require('path');
 const express = require('express')
@@ -129,7 +126,7 @@ const CHARACTER_LEVEL_VALUE_TL_X = 1509;
 const CHARACTER_LEVEL_VALUE_TL_Y = CHARACTER_LEVEL_TEXT_TL_Y;
 
 // Character stat icon dimensions and position
-const CHARACTER_STAT_ICON_TL_X = 1017;
+const CHARACTER_STAT_ICON_TL_X = 1018;
 const CHARACTER_STAT_ICON_TL_Y = 553;
 const CHARACTER_STAT_ICON_DIMENSIONS = 32;
 const CHARACTER_STAT_ICON_HEIGHT_PADDING = 25;
@@ -495,7 +492,7 @@ async function drawBottom(uid, level, achievementCount, primaryColor, showUID) {
 async function drawWatermark(secondaryColor) {
     ctx.font = `${FONT_EXTRA_BOLD} ${FONT_SIZE_WATERMARK} ${FONT_FAMILY}`;
     ctx.fillStyle = secondaryColor;
-    ctx.fillText('Meow Completionists', WATERMARK_TL_X, WATERMARK_TL_Y);
+    ctx.fillText('StarDB.GG', WATERMARK_TL_X, WATERMARK_TL_Y);
 
     ctx.font = `${FONT_SEMIBOLD} ${FONT_SIZE_WATERMARK} ${FONT_FAMILY}`;
     ctx.fillText('@yookers | discord.gg/chives', WATERMARK_TL_X, WATERMARK_TL_Y + WATERMARK_LINE_HEIGHT);
@@ -878,9 +875,9 @@ app.get('/api/generate', async (req, res) => {
     }
 });
 
-const port = process.env.PORT || 5000;
+/* const port = process.env.PORT || 5000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-});
+}); */
 
 module.exports = app;
