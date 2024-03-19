@@ -1,6 +1,6 @@
 {
     "dependencies": {
-        "@napi-rs/canvas": "^0.1.41",
+        "@napi-rs/canvas": "^0.1.44",
         "express": "^4.18.2",
         "node-vibrant": "^3.2.1-alpha.1"
     },
