@@ -503,7 +503,7 @@ async function drawCharacterStats(
     ctx.textAlign = "right";
     // Special case for energy regen rate as the base is 100%
     if (value.name === "Energy Regeneration Rate") {
-      const energyRegenRate = parseFloat(value.value()) + 100;
+      const energyRegenRate = value.value().toFixed(2);
       ctx.fillText(
         `${energyRegenRate}%`,
         CHARACTER_STAT_VALUE_TL_X,
@@ -511,7 +511,7 @@ async function drawCharacterStats(
       );
     } else {
       ctx.fillText(
-        `${value.value()}%`,
+        `${value.value().toFixed(2)}%`,
         CHARACTER_STAT_VALUE_TL_X,
         CHARACTER_STAT_VALUE_TL_Y + CHARACTER_STAT_LINE_HEIGHT * (6 + i)
       );
@@ -1232,7 +1232,7 @@ function sortAdditions(additions) {
         name: addition.name,
         icon: addition.icon,
         value: () => {
-          return (addition.value * 100).toFixed(2);
+          return (addition.value * 100);
         },
       };
     }
@@ -1243,9 +1243,9 @@ function sortAdditions(additions) {
         icon: addition.icon,
         value: () => {
           if (addition.percent) {
-            return (addition.value * 100).toFixed(2);
+            return (addition.value * 100);
           } else {
-            return addition.value.toFixed(2);
+            return addition.value;
           }
         },
       };
@@ -1285,19 +1285,20 @@ function rgbToHex(rgb) {
 function addBaseValue(characterAdditionsData, baseValue, additionKey) {
   let base = parseInt(baseValue, 10);
   if (characterAdditionsData[additionKey]) {
-    base += parseFloat(characterAdditionsData[additionKey].value(), 10);
+
+    base += characterAdditionsData[additionKey].value();
     delete characterAdditionsData[additionKey];
   }
-  return base;
+  return base.toFixed(2);
 }
 
 function addBaseValueFloat(characterAdditionsData, baseValue, additionKey) {
   let base = parseFloat(baseValue, 10);
   if (characterAdditionsData[additionKey]) {
-    base += parseFloat(characterAdditionsData[additionKey].value(), 10);
+    base += characterAdditionsData[additionKey].value();
     delete characterAdditionsData[additionKey];
   }
-  return base;
+  return base.toFixed(2);
 }
 
 // Uses 'node-vibrant' to generate a color palette from an image
